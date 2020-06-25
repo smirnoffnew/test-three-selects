@@ -4,12 +4,16 @@ import { TermsDispatchContext } from "./terms.dispatch";
 import useTermsActions from "./terms.actions";
 import termsReducer from "./terms.reducer";
 
-const initialState = {
-  requested: false,
-  all: null,
-  failed: null,
-  selected: null,
-};
+const termState = localStorage.getItem("service");
+
+const initialState = termState
+  ? JSON.parse(termState)
+  : {
+      requested: false,
+      all: null,
+      failed: null,
+      selected: null,
+    };
 
 const TermsProvider = ({ children }) => {
   const [state, dispatch] = useReducer(termsReducer, initialState);

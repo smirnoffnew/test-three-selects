@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useCallback } from "react";
 import { setURL } from "../../utils";
 import Select from "../Select";
@@ -9,12 +10,11 @@ const FilterSelect = ({ name, getData, selectData, state, placeholder }) => {
     if (!entityState.all) {
       await getData();
     }
-  }, [getData, entityState.all]);
+  }, []);
 
   useEffect(() => {
     fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchData]);
 
   const handleSelectChange = ({ target: { value } }) => {
     selectData(JSON.parse(value));

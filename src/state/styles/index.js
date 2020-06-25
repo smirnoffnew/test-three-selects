@@ -4,12 +4,16 @@ import { StylesDispatchContext } from "./styles.dispatch";
 import useStylesActions from "./styles.actions";
 import stylesReducer from "./styles.reducer";
 
-const initialState = {
-  requested: false,
-  all: null,
-  failed: null,
-  selected: null,
-};
+const styleState = localStorage.getItem("style");
+
+const initialState = styleState
+  ? JSON.parse(styleState)
+  : {
+      requested: false,
+      all: null,
+      failed: null,
+      selected: null,
+    };
 
 const StylesProvider = ({ children }) => {
   const [state, dispatch] = useReducer(stylesReducer, initialState);

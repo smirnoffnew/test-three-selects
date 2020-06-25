@@ -38,10 +38,15 @@ const useStylesActions = () => {
       requestStyles();
 
       const { data } = await get(styleURL);
+      const transformedStylesData = data.map((style) => ({
+        id: +style.id,
+        label: style.label,
+        slug: style.slug,
+      }));
 
-      getStylesSucceed(data);
+      getStylesSucceed(transformedStylesData);
 
-      return data;
+      return transformedStylesData;
     } catch (error) {
       getStylesFailed(error.message);
     }

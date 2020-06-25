@@ -1,5 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useCallback } from "react";
-import * as CONSTANS from "../../constants";
+import * as CONSTANTS from "../../constants";
 import FilterSelect from "../FilterSelect";
 import { isEmpty } from "../../utils";
 import useParseLink from "../../state/parseLink";
@@ -34,7 +35,6 @@ export default () => {
     selectTerm(isEmpty(res.service) ? null : res.service);
     selectBrand(isEmpty(res.brand) ? null : res.brand);
     selectStyle(isEmpty(res.style) ? null : res.style);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export default () => {
     <div className="navbar">
       <FilterSelect
         state={state}
-        name={CONSTANS.service}
+        name={CONSTANTS.service}
         getData={getTerms}
         selectData={selectTerm}
         placeholder="select term"
@@ -60,7 +60,7 @@ export default () => {
       {termsState.selected && (
         <FilterSelect
           state={state}
-          name={CONSTANS.brand}
+          name={CONSTANTS.brand}
           getData={getBrands}
           selectData={selectBrand}
           placeholder="select brand"
@@ -69,7 +69,7 @@ export default () => {
       {termsState.selected && brandsState.selected && (
         <FilterSelect
           state={state}
-          name={CONSTANS.style}
+          name={CONSTANTS.style}
           getData={getStyles}
           selectData={selectStyle}
           placeholder="select style"

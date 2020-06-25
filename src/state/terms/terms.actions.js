@@ -27,7 +27,6 @@ const useTermsActions = () => {
   };
 
   const selectTerm = (term) => {
-    console.log(term);
     dispatch({
       type: ACTIONS.SELECT_TERM,
       payload: term,
