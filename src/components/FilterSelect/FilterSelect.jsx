@@ -28,7 +28,7 @@ const FilterSelect = ({ name, getData, selectData, placeholder }) => {
           eventedPushState(null, null, `${origin}/${resultArr.join('/')}`)
         }
         else {
-          eventedPushState(null, null, `${origin}/s-${JSON.parse(value).slug}`)
+          eventedPushState(null, null, `${origin}/s-${JSON.parse(value).slug}/${url[1] || ''}/${url[2] || ''}`)
         }
         break;
       }
@@ -41,7 +41,7 @@ const FilterSelect = ({ name, getData, selectData, placeholder }) => {
         }
         else {
           eventedPushState(null, null, 
-            `${origin}/${url[0]}/b-${JSON.parse(value).slug}`
+            `${origin}/${url[0] || ''}/b-${JSON.parse(value).slug}/${url[2] || ''}`
           );
         }
         break;
@@ -55,7 +55,7 @@ const FilterSelect = ({ name, getData, selectData, placeholder }) => {
         }
         else {
           eventedPushState(null, null, 
-            `${origin}/${url[0]}/${url[1]}/st-${JSON.parse(value).slug}`
+            `${origin}/${url[0] || ''}/${url[1] || ''}/st-${JSON.parse(value).slug}`
           );
         }
         break;
