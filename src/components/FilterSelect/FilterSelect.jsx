@@ -1,15 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useCallback } from "react";
-import { setURL } from "../../utils";
+import React, { useEffect, useCallback, useState } from "react";
+import { service, brand, style } from "../../constants";
 import Select from "../Select";
+import { eventedPushState } from "../../utils";
 
-const FilterSelect = ({ name, getData, selectData, state, placeholder }) => {
-  const entityState = state[name];
+const FilterSelect = ({ name, getData, selectData, placeholder }) => {
+  const [all, setAll] = useState()
+  const [loading, setLoading] = useState()
 
   const fetchData = useCallback(async () => {
-    if (!entityState.all) {
-      await getData();
-    }
+    setLoading(true)
+    const data = await getData();
+    setLoading(false)
+    setAll(data)
   }, []);
 
   useEffect(() => {
@@ -17,28 +20,59 @@ const FilterSelect = ({ name, getData, selectData, state, placeholder }) => {
   }, [fetchData]);
 
   const handleSelectChange = ({ target: { value } }) => {
-    selectData(JSON.parse(value));
-    setURL({
-      name,
-      slug: JSON.parse(value).slug,
-      state,
-    });
+    const url = document.location.pathname.split("/").slice(1);
+    switch (name) {
+      case service: {
+        if (url[0]?.includes('s-')) {
+          const resultArr = url.map((x) => x.startsWith('s-') ? `s-${JSON.parse(value).slug}` : x);
+          eventedPushState(null, null, `${origin}/${resultArr.join('/')}`)
+        }
+        else {
+          eventedPushState(null, null, `${origin}/s-${JSON.parse(value).slug}`)
+        }
+        break;
+      }
+      case brand: {
+        if (url[1]?.includes('b-')) {
+          const resultArr = url.map((x) => {
+            return x.startsWith('b-') ? `b-${JSON.parse(value).slug}` : x
+          });
+          eventedPushState(null, null, `${origin}/${resultArr.join('/')}`);
+        }
+        else {
+          eventedPushState(null, null, 
+            `${origin}/${url[0]}/b-${JSON.parse(value).slug}`
+          );
+        }
+        break;
+      }
+      case style: {
+        if (url[2]?.includes('st-')) {
+          const resultArr = url.map((x) => {
+            return x.startsWith('st-') ? `st-${JSON.parse(value).slug}` : x
+          });
+          eventedPushState(null, null, `${origin}/${resultArr.join('/')}`);
+        }
+        else {
+          eventedPushState(null, null, 
+            `${origin}/${url[0]}/${url[1]}/st-${JSON.parse(value).slug}`
+          );
+        }
+        break;
+      }
+    }
   };
 
-  return (
-    <>
-      <Select
-        options={entityState.all}
-        name={name}
-        onChange={handleSelectChange}
-        loading={entityState.requested}
-        selected={entityState.selected}
-        placeholder={placeholder}
-        value={JSON.stringify(entityState.selected)}
-      />
-      {entityState.failed && entityState.failed}
-    </>
-  );
+  return <Select
+    options={all}
+    name={name}
+    onChange={handleSelectChange}
+    loading={loading}
+    selected={selectData}
+    placeholder={placeholder}
+    value={JSON.stringify(selectData)}
+  />
+
 };
 
 export default FilterSelect;

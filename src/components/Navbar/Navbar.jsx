@@ -1,80 +1,72 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import * as CONSTANTS from "../../constants";
 import FilterSelect from "../FilterSelect";
-import { isEmpty } from "../../utils";
-import useParseLink from "../../state/parseLink";
-import useTerms from "../../state/terms";
-import useBrands from "../../state/brands";
-import useStyles from "../../state/styles";
+import { isEmpty, getTerms, getBrands, getStyles, getParseLink, eventedPushState } from "../../utils";
 
 export default () => {
-  const [parseLinkState, { getParseLink }] = useParseLink();
-  const [termsState, { selectTerm, getTerms }] = useTerms();
-  const [brandsState, { selectBrand, getBrands }] = useBrands();
-  const [styleState, { selectStyle, getStyles }] = useStyles();
+  const [term, setTerm] = useState();
+  const [brand, setBrand] = useState();
+  const [style, setStyle] = useState();
+  const [urlState, setUrlState] = useState();
 
   const fetchData = useCallback(async () => {
     const dataURL = document.location.pathname.split("/").slice(1);
     const res = await getParseLink(
-      `?service_slug=${dataURL[0]}&brand_slug=${dataURL[1]}&style_slug=${dataURL[2]}`
+      `?service_slug=${dataURL[0]?.slice(2)}&brand_slug=${dataURL[1]?.slice(2)}&style_slug=${dataURL[2]?.slice(3)}`
     );
 
     if (dataURL[0] && isEmpty(res.service)) {
-      document.location = new URL(`${origin}`);
+      eventedPushState(null, null, `${origin}`);
     }
     if (dataURL[1] && isEmpty(res.brand)) {
-      document.location = new URL(`${origin}/${termsState.selected?.slug}`);
+      eventedPushState(null, null, `${origin}/s-${res.service.slug}`);
     }
     if (dataURL[2] && isEmpty(res.style)) {
-      document.location = new URL(
-        `${origin}/${termsState.selected?.slug}/${brandsState.selected.slug}`
+      eventedPushState(null, null, 
+        `${origin}/s-${res.service.slug}/b-${res.brand.slug}`
       );
     }
 
-    selectTerm(isEmpty(res.service) ? null : res.service);
-    selectBrand(isEmpty(res.brand) ? null : res.brand);
-    selectStyle(isEmpty(res.style) ? null : res.style);
+    setTerm(isEmpty(res.service) ? null : res.service);
+    setBrand(isEmpty(res.brand) ? null : res.brand);
+    setStyle(isEmpty(res.style) ? null : res.style);
   }, []);
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+  }, [fetchData, urlState]);
 
-  const state = {
-    service: termsState,
-    brand: brandsState,
-    style: styleState,
-    parseLink: parseLinkState,
-  };
+  useEffect(() => {
+    document.addEventListener(
+      "onpushstate",
+      ({ detail }) => {
+        setUrlState(detail.url)
+      },
+      false
+    );
+    return () => document.removeEventListener("onpushstate")
+  }, [])
 
   return (
     <div className="navbar">
       <FilterSelect
-        state={state}
         name={CONSTANTS.service}
         getData={getTerms}
-        selectData={selectTerm}
+        selectData={term}
         placeholder="select term"
       />
-      {termsState.selected && (
-        <FilterSelect
-          state={state}
-          name={CONSTANTS.brand}
-          getData={getBrands}
-          selectData={selectBrand}
-          placeholder="select brand"
-        />
-      )}
-      {termsState.selected && brandsState.selected && (
-        <FilterSelect
-          state={state}
-          name={CONSTANTS.style}
-          getData={getStyles}
-          selectData={selectStyle}
-          placeholder="select style"
-        />
-      )}
+      <FilterSelect
+        name={CONSTANTS.brand}
+        getData={getBrands}
+        selectData={brand}
+        placeholder="select brand"
+      />
+      <FilterSelect
+        name={CONSTANTS.style}
+        getData={getStyles}
+        selectData={style}
+        placeholder="select style"
+      />
     </div>
   );
 };
